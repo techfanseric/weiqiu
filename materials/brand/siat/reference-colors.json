@@ -1,0 +1,35 @@
+{
+  "status": "Design reference, not official VI standard",
+  "colors": [
+    {
+      "name": "brand-deep",
+      "hex": "#014099",
+      "evidence": "Most frequent opaque blue pixel in official szxjy-logo.png (10123 pixels)",
+      "classification": "logo_pixel_sample"
+    },
+    {
+      "name": "website-accent",
+      "hex": "#014EC0",
+      "evidence": "szxjy-web-style.css .index-title .fr:hover background, page-style.css .section-title .btn01:hover",
+      "classification": "official_site_css"
+    },
+    {
+      "name": "website-light-surface",
+      "hex": "#F5F8FC",
+      "evidence": "szxjy-web-style.css selectors: /*文字列表*/\n/*文字列表  comp-text-list-01*/\n/**!\n @color - 标题颜色\n @box-bg - box 盒子背景颜色\n @padding - box 盒子边距设置\n @iconBgCol - 图标颜色\n @height - 盒子行高\n */\n.comp-text-list-01 li:nth-child(2n + 1); .comp-text-list-02 .box-s; .comp-text-list-03 .box-s .box-date",
+      "classification": "official_site_css"
+    },
+    {
+      "name": "identity-container",
+      "hex": "#00468B",
+      "evidence": "page-style.css .logo-box .logo-color background",
+      "classification": "official_site_css"
+    },
+    {
+      "name": "surface",
+      "hex": "#FFFFFF",
+      "evidence": "Common website CSS white, adopted for user-requested light UI",
+      "classification": "project_adoption"
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+@import './breakpoint.less';
+* {
+  box-sizing: border-box;
+}
+
+html, body, #app{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+  /* 显式字体栈：原来走浏览器默认（西文 Times 系），层级与观感都不稳；
+     中文用系统 CJK，数字/编号在局部再叠加 --lx-mono */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--lx-ground, var(--color-bg-1, #131519));
+  color: var(--color-text-1);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+html {
+  /* body[arco-theme=dark] 的变量作用域在 body，html 单独兜底深色 */
+  background-color: var(--lx-ground, #131519);
+}
+body[arco-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media screen and (max-height: @screen-xxl) {
+  html, body, #app{
+    font-size: 22px;
+  }
+}
+
+@media screen and (max-height: @screen-xl) {
+  html, body, #app{
+    font-size: 20px;
+  }
+}
+@media screen and (max-height: @screen-lg) {
+  html, body, #app{
+    font-size: 18px;
+  }
+}
+@media screen and (max-height: @screen-md) {
+  html, body, #app{
+    font-size: 16px;
+  }
+}
+@media screen and (max-height: @screen-sm) {
+  html, body, #app{
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-height: @screen-xs) {
+  html, body, #app{
+    font-size: 12px;
+  }
+}
+
+
+
+.arco-layout,.arco-layout-content{
+  overflow: hidden;
+}
+.modal-larger{
+  height: 80%;
+  width:80% !important;
+  .arco-modal-body{
+    height: calc(100% - 110px);
+  }
+}
+
+.w-full{
+  width: 100%;
+}
+.h-full{
+  height: 100%;
+}
+.space-between{
+  display: flex;
+  justify-content: space-between;
+}
+.inverse-color{
+  color: white;
+}
+
+
+.overflow-y-scroll{
+  overflow-y: scroll;
+}
+
+.layout-content{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  /* Linear 式：内容区用 ground 底，页面容器改成「浮起的面板」（1px 发丝边框 + 圆角），
+     不再用 box-shadow 做层级 —— 原来的 0 -2px 阴影是向上投的，视觉上无效 */
+  background-color: var(--lx-ground, var(--color-fill-1));
+  overflow: hidden;
+  .layout-table{
+    background-color: var(--lx-surface-1, var(--color-bg-1));
+    border: 1px solid var(--lx-hairline, var(--color-border-2));
+    border-radius: var(--lx-r-lg, 12px);
+    box-shadow: none;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .table-header{
+    height: 3.5rem;
+    display: flex;
+    padding: 0 1rem;
+    justify-content: space-between;
+  }
+  .table-content{
+    width: 100%;
+    height: calc( 100% - 7rem);
+  }
+  .table-footer{
+    padding: 0 1rem;
+    height: 3.5rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+
+@keyframes running-line {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+/* ==========================================================================
+   Linear 式设计 token（v1 · 2026-09-23 提亮）
+   纯变量声明，不命中任何元素、不改变任何既有样式；全站引用。
+   回退：删掉本段即可（引用处的 var() 会走各自兜底值）。
+
+   v1 提亮说明：v0 的底色（#08090A）与三级文字（#6C7280）实测对比度只有
+   3.6:1，低于正文 4.5:1 的门槛，标签/单位/次要信息基本"糊"在底上。
+   这次把底色整体抬一档（对齐 GitHub Dark / VS Code Dark+ 的亮度区间），
+   同时把文字同步提亮，净对比度是提升的：
+     底色层级  ground #131519 → chrome #181B20 → surface-1 #1F2229
+     对比度    text-3 5.8:1（原 3.6）· text-2 9.4:1（原 6.2）
+   ========================================================================== */
+:root {
+  /* 层级底色：chrome 比内容更深，内容面板才"浮"起来 */
+  --lx-ground: #131519;          /* 页面底 */
+  --lx-chrome: #181B20;          /* 顶栏 / 侧栏 */
+  --lx-surface-1: #1F2229;       /* 面板 */
+  --lx-surface-2: #272A32;       /* 面板内嵌块 */
+  --lx-surface-3: #32363F;       /* 抬起 / hover */
+
+  /* 发丝边框：替代阴影做层级（底变亮后原 0.07 几乎不可见，提到 0.10） */
+  --lx-hairline: rgba(255, 255, 255, 0.10);
+  --lx-hairline-2: rgba(255, 255, 255, 0.16);
+
+  /* 画布点阵网格（X6 流程图画布用；JS 侧 getComputedStyle 读取） */
+  --lx-grid-dot: rgba(255, 255, 255, 0.09);
+
+  /* 三级文字 */
+  --lx-text-1: #FAFBFC;
+  --lx-text-2: #C0C7D2;
+  --lx-text-3: #949CAA;
+
+  /* 强调色：占屏 <5%，只给激活态 / 关键数值
+     accent 用于色块/描边，accent-2 用于「强调色文字」（底色是深灰，需要更亮） */
+  --lx-accent: #6B77E0;
+  --lx-accent-2: #8F99F2;
+  --lx-accent-soft: rgba(124, 134, 232, 0.20);
+
+  /* 状态色：仅用于告警与判定，不做装饰 */
+  --lx-ok: #4BD05F;
+  --lx-warn: #E5B03C;
+  --lx-danger: #FF6F66;
+
+  /* 等宽：数字 / 编号 / 时间戳 */
+  --lx-mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+
+  --lx-r-sm: 6px;
+  --lx-r-md: 10px;
+  --lx-r-lg: 13px;
+}
+
+/* ---------------------------------------------------------------
+   强调色：把 Arco 的 primary 色阶整体换成这套靛紫
+   （实测暗色主题原值 primary-6 = 60,126,255 即 Arco 蓝）
+   作用域 = 全局，所以侧栏选中态 / 按钮 / 开关 / 聚焦环会一起跟随；
+   其他页面的「布局」不变，只是强调色从蓝换成靛紫。
+   想只让首页+登录页用：把本块移到 .home-console / .login-container 里。
+   --------------------------------------------------------------- */
+/* 注意：main.less 在 main.ts 里先于 arco.css 导入，同权重会被 Arco 自己的
+   body[arco-theme='dark'] 覆盖，所以这里用 html body[...] 提高一级权重。 */
+html body[arco-theme='dark'] {
+  --arcoblue-6: 94, 106, 210;
+  --primary-1: 18, 20, 44;
+  --primary-2: 26, 30, 68;
+  --primary-3: 36, 42, 94;
+  --primary-4: 48, 56, 124;
+  --primary-5: 78, 88, 175;
+  --primary-6: 94, 106, 210;
+  --primary-7: 134, 144, 236;
+  --primary-8: 172, 180, 246;
+  /* 这几个 light 变体在 dist css 里是写死的 rgba，不跟随上面的色阶，需要单独改。
+     light-3 是 outline 按钮 disabled 态（如顶栏未运行时的「暂停」）的描边+文字色，
+     原 0.5 在深底上只有 1.9:1、几乎看不见 → 提到 0.68 还是不够（实测 3.87:1），
+     按公式反推 α≈0.90 才够 4.5:1，取 0.92 留点余量。 */
+  --color-primary-light-1: rgba(124, 134, 232, 0.22);
+  --color-primary-light-2: rgba(124, 134, 232, 0.38);
+  --color-primary-light-3: rgba(124, 134, 232, 0.92);
+  --color-primary-light-4: rgba(124, 134, 232, 0.92);
+}
+
+/* ---------------------------------------------------------------
+   暗色底 / 文字提亮（v1）
+   Arco 自带的暗色变量（bg-1 #17171a、border #2e2e30、text-3 = rgba(255,255,255,.5)）
+   在近黑底上对比度普遍偏低：表格分隔线、分组头、空态说明基本看不清。
+   这里整体抬一档并与 --lx-* 层级对齐。
+   注意顺序不能反：main.less 先于 arco.css 导入，同权重会被 Arco 覆盖，
+   所以统一加 html body 前缀提权。
+   --------------------------------------------------------------- */
+html body[arco-theme='dark'] {
+  /* 文字：半透明白在更亮的底上合成值也会变亮，透明度同步抬高补回对比度 */
+  --color-text-1: rgba(255, 255, 255, 0.94);
+  --color-text-2: rgba(255, 255, 255, 0.76);
+  --color-text-3: rgba(255, 255, 255, 0.58);
+  --color-text-4: rgba(255, 255, 255, 0.38);
+
+  /* 背景层级：bg-1 略高于 .layout-table(#1F2229)，避免"面板里挖了个更暗的洞" */
+  --color-bg-1: #22252C;
+  --color-bg-2: #2A2E36;
+  --color-bg-3: #32363F;
+  --color-bg-4: #3A3F49;
+  --color-bg-5: #434854;
+  --color-bg-white: #2A2E36;
+  --color-bg-popup: #2A2E36;
+
+  --color-fill-1: rgba(255, 255, 255, 0.05);
+  --color-fill-2: rgba(255, 255, 255, 0.09);
+  --color-fill-3: rgba(255, 255, 255, 0.14);
+  --color-fill-4: rgba(255, 255, 255, 0.19);
+
+  --color-border-1: #363A44;
+  --color-border-2: #434852;
+  --color-border-3: #51565F;
+  --color-border-4: #5F646D;
+
+  --color-neutral-1: #22252C;
+  --color-neutral-2: #363A44;
+  --color-neutral-3: #434852;
+  --color-neutral-4: #51565F;
+  --color-neutral-5: #6C7280;
+  --color-neutral-6: #A8ADB6;
+  --color-neutral-7: #C2C6CD;
+  --color-neutral-8: #D4D7DC;
+  --color-neutral-9: #E2E4E8;
+  --color-neutral-10: #F2F3F5;
+}
+
+/* 「强调色当文字」的场景：Arco 用 primary-6(#5E6AD2) 直接当字色，
+   在深灰底上只有 ~3.5:1。换成提亮版 accent-2；
+   按钮底色仍然用 primary-6，所以主按钮的白字对比度不受影响。 */
+html body[arco-theme='dark'] .arco-pagination-item-active,
+html body[arco-theme='dark'] .arco-pagination-item:not(.arco-pagination-item-disabled):hover,
+html body[arco-theme='dark'] .arco-tabs-tab-active .arco-tabs-tab-title,
+html body[arco-theme='dark'] .arco-tabs-tab:hover .arco-tabs-tab-title{
+  color: var(--lx-accent-2);
+}
+
+/* outline 按钮（初始化 / 查看数据 / 搜索…）：描边与文字本来都用 primary-6，
+   在深灰底上 3.7:1。文字换 accent-2，描边用 accent（比文字略深，不抢眼） */
+html body[arco-theme='dark'] .arco-btn-outline:not(.arco-btn-disabled){
+  color: var(--lx-accent-2);
+  border-color: var(--lx-accent);
+}
+
+/* 文字按钮（查看流程 / 更多…）：同上，Arco 默认 primary-6 当字色。
+   排除 .lx-icon-btn —— 那些图标按钮走上面的灰色 token（比紫色克制），
+   也排除带 status 的按钮（红色删除 / 橙色清空要保留语义色）。 */
+html body[arco-theme='dark'] .arco-btn-text:not(.lx-icon-btn):not(.arco-btn-disabled):not(.arco-btn-status-danger):not(.arco-btn-status-warning):not(.arco-btn-status-success):not(.arco-btn-status-info){
+  color: var(--lx-accent-2);
+}
+
+/* 实心按钮的 disabled 态：Arco 给的是「primary-light-3 当底 + 白字降透明度」，
+   白字压在半透明紫底上实测只有 1.86:1 —— 等于看不清写了什么（顶栏未运行时的「运行」）。
+   改成「很淡的强调底色 + --lx-text-3 字」（实测 4.68:1）：既保留"这是主按钮、
+   但现在不可用"的语义，又读得清；不用中性灰是为了别和 secondary 按钮混淆。
+   outline 的 disabled 不在此列，它走 --color-primary-light-3（见上方 alpha 调整）。 */
+html body[arco-theme='dark'] .arco-btn-primary.arco-btn-disabled,
+html body[arco-theme='dark'] .arco-btn-secondary.arco-btn-disabled{
+  background: var(--lx-accent-soft, rgba(124, 134, 232, 0.20));
+  color: var(--lx-text-3, #949CAA);
+  border-color: transparent;
+}
+
+/* 空态描述：Arco 写的是 rgb(var(--gray-5))（#78787A），不在上面 bg/text 覆盖范围内 */
+html body[arco-theme='dark'] .arco-empty-description{
+  color: var(--lx-text-3);
+}
+
+/* 开关上的文字：Arco 用 --color-white，而暗色下该变量是 rgba(255,255,255,.9)，
+   叠在 primary-6 底上只有 4.15:1。纯白即可达标（4.7:1）。 */
+html body[arco-theme='dark'] .arco-switch-checked .arco-switch-text,
+html body[arco-theme='dark'] .arco-switch[disabled] .arco-switch-text{
+  color: #FFFFFF;
+}
+
+/* 面板骨架（opt-in 工具类，只有显式加了 .lx-panel 的元素才命中） */
+.lx-panel{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--lx-surface-1, var(--color-bg-2));
+  border: 1px solid var(--lx-hairline, var(--color-border-2));
+  border-radius: var(--lx-r-lg, 12px);
+  overflow: hidden;
+}
+.lx-panel-head{
+  flex-shrink: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 13px;
+  border-bottom: 1px solid var(--lx-hairline, var(--color-border-2));
+}
+.lx-panel-title{
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--lx-text-2, var(--color-text-2));
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lx-panel-meta{
+  font-family: var(--lx-mono, monospace);
+  font-size: 0.6rem;
+  color: var(--lx-text-3, var(--color-text-3));
+  white-space: nowrap;
+}
+.lx-panel-extra{
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.lx-panel-body{
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.lx-empty{
+  height: 100%;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* ==========================================================================
+   Linear 式外壳 v1（2026-09-23）：侧栏菜单 / logo / 物料页工具
+   —— 全局规则，但都用 .sider-bar / .lx-* 限定作用域，不命中无关元素
+   ========================================================================== */
+
+/* 侧栏菜单：选中态 = 低饱和强调底 + 左侧 2px 强调条；hover 只做极淡抬起。
+   加 html body 前缀提高权重 —— Arco 自己的 .arco-menu-light/暗色规则会覆盖同权重的 scoped 样式 */
+html body .sider-bar{
+  .arco-menu{
+    background: transparent;
+    border-right: none;
+  }
+  .arco-menu-inner{
+    padding: 6px 0 14px;
+  }
+  .arco-menu-item,
+  .arco-menu-inline-header{
+    height: 2.15rem;
+    line-height: 2.15rem;
+    margin: 2px 8px;
+    padding-right: 10px;
+    border-radius: var(--lx-r-sm, 6px);
+    font-size: 0.72rem;
+    color: var(--lx-text-2, var(--color-text-2));
+    transition: background 0.15s ease, color 0.15s ease;
+    position: relative;
+  }
+  .arco-menu-inline-header{
+    padding-left: 10px;
+  }
+  .arco-menu-item:hover,
+  .arco-menu-inline-header:hover{
+    background: var(--lx-surface-3, var(--color-fill-3));
+    color: var(--lx-text-1, var(--color-text-1));
+  }
+  /* 选中态：叶子菜单项与子菜单头统一（子菜单收起时，被选中的是它的头） */
+  .arco-menu-item.arco-menu-selected,
+  .arco-menu-inline-header.arco-menu-selected{
+    background: var(--lx-accent-soft, rgba(94, 106, 210, 0.16));
+    color: var(--lx-accent-2, rgb(var(--primary-6)));
+    font-weight: 500;
+  }
+  .arco-menu-item.arco-menu-selected::before,
+  .arco-menu-inline-header.arco-menu-selected::before{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 2px;
+    height: 1.05rem;
+    margin-top: -0.525rem;
+    border-radius: 0 2px 2px 0;
+    background: var(--lx-accent, rgb(var(--primary-6)));
+  }
+  .arco-menu-icon{
+    color: inherit;
+    opacity: 0.85;
+  }
+  /* 折叠态：图标居中，去掉左右 margin 造成的偏斜 */
+  .arco-menu-collapsed .arco-menu-item,
+  .arco-menu-collapsed .arco-menu-inline-header{
+    margin: 2px 6px;
+    padding: 0;
+    justify-content: center;
+  }
+  /* logo 区：CSS 画的标记方块 + 字距收窄的标题，不依赖图片资源 */
+  .logo-box{
+    gap: 8px;
+  }
+  .logo-box::before{
+    content: '';
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 2px;
+    background: linear-gradient(140deg, var(--lx-accent-2, #7C86E8), var(--lx-accent, #5E6AD2));
+    box-shadow: 0 0 0 3px var(--lx-accent-soft, rgba(94, 106, 210, 0.16));
+    flex-shrink: 0;
+  }
+}
+
+/* 页面工具条：左侧操作、右侧主操作，间距走 4pt 节奏 */
+.lx-toolbar{
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+/* 面板头 / 卡片里的图标按钮（全选、编辑、删除、运行…），压成 24×24 的方形 token。
+   需要 html body 前缀提权：Arco 会给文字按钮兜一层 primary-6 默认字色，
+   primary-6 在深灰底上只有 ~3:1（实测 .lx-icon-btn 被盖成 rgb(94,106,210)），
+   而 main.less 先于 arco.css 导入、同权重会被它覆盖。
+   带 status 的按钮（如红色删除）不在此列，保留各自的语义色。
+
+   ⚠️ 坑：不要写成 :not([class*='arco-btn-status-']) ——
+   Arco 给**每一个**按钮都挂了 arco-btn-status-normal（无 status 时就是它），
+   于是那条 :not 恒为假、整条规则失效；尺寸能生效是因为它来自下面无 :not 的那条，
+   结果就是"大小对了、颜色没变"，很容易误判成优先级不够。
+   正确做法：只排除具体的语义状态类。 */
+html body .lx-icon-btn.arco-btn:not(.arco-btn-status-danger):not(.arco-btn-status-warning):not(.arco-btn-status-success):not(.arco-btn-status-info){
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0;
+  border-radius: var(--lx-r-sm, 6px);
+  color: var(--lx-text-3, var(--color-text-3));
+  background: transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+html body .lx-icon-btn.arco-btn:not(.arco-btn-status-danger):not(.arco-btn-status-warning):not(.arco-btn-status-success):not(.arco-btn-status-info):hover{
+  background: var(--lx-surface-3, var(--color-fill-3));
+  color: var(--lx-text-1, var(--color-text-1));
+}
+/* 图标按钮统一 24×24（含带 status 的） */
+html body .lx-icon-btn.arco-btn{
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0;
+  border-radius: var(--lx-r-sm, 6px);
+  background: transparent;
+}
+
+/* 区域计数：数字等宽 + 强调色，label 弱化 */
+.lx-count{
+  font-family: var(--lx-mono, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  color: var(--lx-text-3, var(--color-text-3));
+}
+.lx-count b{
+  font-weight: 600;
+  color: var(--lx-accent-2, rgb(var(--primary-6)));
+}

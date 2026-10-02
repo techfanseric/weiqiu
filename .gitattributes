@@ -1,0 +1,9 @@
+materials/originals/** -text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.mp4 binary
+*.pdf binary
+*.pptx binary
+*.zip binary
+*.exe binary

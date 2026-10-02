@@ -1,0 +1,17 @@
+.DS_Store
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/coverage/
+**/.env
+**/.env.*
+!**/.env.example
+*.local
+/work/
+*.log
+
+# Private source archive and pre-publication evidence remain local.
+/materials/originals/
+/materials/extracted/
+/materials/manifest.json
+/evidence/

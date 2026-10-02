@@ -1,0 +1,71 @@
+{
+  "institution": "中国科学院深圳先进技术研究院",
+  "officialHome": "https://www.siat.ac.cn/",
+  "institutionPage": "https://www.siat.ac.cn/jggl/jgjj/",
+  "assets": [
+    {
+      "file": "szxjy-logo.png",
+      "sourceUrl": "https://www.siat.ac.cn/images/szxjy-logo.png",
+      "retrievedOn": "2026-10-02",
+      "bytes": 124871,
+      "sha256": "8da60ce685e96a4013b5df78e279aee0e917862e7c7167023a7fedbd2bddc9a1",
+      "description": "Chinese website header lockup; reverse white lettering"
+    },
+    {
+      "file": "szxjy-logo-foot.png",
+      "sourceUrl": "https://www.siat.ac.cn/images/szxjy-logo-foot.png",
+      "retrievedOn": "2026-10-02",
+      "bytes": 142965,
+      "sha256": "331e108ed4cbdec45ac8ff60cda8d2024f00e89ccee06afa33ea6a50052cdbd8",
+      "description": "Chinese website footer lockup"
+    },
+    {
+      "file": "szxjy-zjxjy-logo.png",
+      "sourceUrl": "https://www.siat.ac.cn/images/szxjy-zjxjy-logo.png",
+      "retrievedOn": "2026-10-02",
+      "bytes": 42734,
+      "sha256": "dc3010fd4fe1ad6d34b91be80b93ccf956ec8fee8f1f6f250e4f5663d924d650",
+      "description": "White decorative SIAT mark; alternative only"
+    },
+    {
+      "file": "siaten2025-logo.png",
+      "sourceUrl": "https://english.siat.ac.cn/images/siaten2025-logo.png",
+      "retrievedOn": "2026-10-02",
+      "bytes": 60064,
+      "sha256": "7a68ed8bcace54124a5368908933618eb9e1f63a14e3dfe1b31f051ebba9d044",
+      "description": "English website header lockup; reverse white lettering"
+    },
+    {
+      "file": "siaten2025-footer-logo.png",
+      "sourceUrl": "https://english.siat.ac.cn/images/siaten2025-footer-logo.png",
+      "retrievedOn": "2026-10-02",
+      "bytes": 37843,
+      "sha256": "60f554b34db24e3cf99f0d9c97c6d7735ef85aa5d552019d54b57eec4bcfa14d",
+      "description": "English website footer lockup"
+    },
+    {
+      "file": "identity-teaser.jpg",
+      "sourceUrl": "https://www.siat.ac.cn/jggl/bsxt/images/P020241221392448307549.jpg",
+      "retrievedOn": "2026-10-02",
+      "bytes": 84523,
+      "sha256": "06765085800442be38d8d3e2982e3ac4f99046840a27c27c0e2c0065680fc79e",
+      "description": "SIAT institute emblem on white from official identity section teaser; raster, not vector master"
+    },
+    {
+      "file": "szxjy-web-style.css",
+      "sourceUrl": "https://www.siat.ac.cn/images/szxjy-web-style.css",
+      "retrievedOn": "2026-10-02",
+      "bytes": 119254,
+      "sha256": "8753586eaf36c93d17cd6a36c0e2ca4e92ca059ed21598cb053672707a9b8955",
+      "description": "Official website CSS, observed colors; not a VI specification"
+    },
+    {
+      "file": "page-style.css",
+      "sourceUrl": "https://www.siat.ac.cn/images/page-style.css",
+      "retrievedOn": "2026-10-02",
+      "bytes": 114709,
+      "sha256": "fc408b1dc811d353041510b457f7913775f5db00f05350491503436fa35a36c3",
+      "description": "Official website CSS, observed colors; not a VI specification"
+    }
+  ]
+}
