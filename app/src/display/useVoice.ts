@@ -13,6 +13,7 @@ import {
   type Quality,
   type Snapshot,
 } from "./model";
+import { loadXfIatCredentials, XfIatSession } from "./xfIat";
 export function useVoice(
   snapshot: Ref<Snapshot | null>,
   quality: ComputedRef<Quality>,
@@ -25,10 +26,13 @@ export function useVoice(
   const captionId = ref(0);
   const highlight = ref<Intent | null>(null);
   const muted = ref(false);
-  const supported = !!(
+  const browserSupported = !!(
     (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   );
+  const cloudConfigured = !!loadXfIatCredentials();
+  const supported = cloudConfigured || browserSupported;
   let recognition: any;
+  let iat: XfIatSession | null = null;
   let clearTimer: ReturnType<typeof setTimeout>;
   let listenTimer: ReturnType<typeof setTimeout>;
   let safetyTimer: ReturnType<typeof setTimeout>;
@@ -71,6 +75,8 @@ export function useVoice(
     captionUntil = 0;
     pausedAt = null;
     clearRequested = false;
+    iat?.abort();
+    iat = null;
     recognition?.abort();
     recognition = null;
     window.speechSynthesis?.cancel();
@@ -119,10 +125,44 @@ export function useVoice(
       intent,
     );
   }
+  function handleTranscript(text: string) {
+    const intent = detectIntent(text);
+    if (intent) ask(intent);
+    else
+      show(
+        "我可以介绍实验、当前步骤、样本数量、剩余时间和检测结果，请换一种说法。",
+      );
+  }
   function begin() {
     if (phase.value === "listening") return;
     stop();
-    if (!supported) {
+    const token = session;
+    const creds = loadXfIatCredentials();
+    if (creds) {
+      phase.value = "listening";
+      caption.value = "正在聆听，请说话…";
+      iat = new XfIatSession(creds, {
+        onInterim: (text) => {
+          if (token === session) caption.value = text;
+        },
+        onFinal: (text) => {
+          if (token !== session) return;
+          if (text) handleTranscript(text);
+          else show("没有收到可识别的语音，请重试。");
+        },
+        onError: (message) => {
+          if (token !== session) return;
+          show(`${message}，可使用问题按钮查询。`);
+        },
+      });
+      iat.start().catch(() => {
+        if (token === session)
+          show("无法访问麦克风，请在浏览器授权后重试，或使用问题按钮查询。");
+      });
+      listenTimer = setTimeout(end, 15000);
+      return;
+    }
+    if (!browserSupported) {
       show("此浏览器暂不支持语音识别，请使用问题按钮查询。");
       return;
     }
@@ -132,19 +172,21 @@ export function useVoice(
     recognition = new Constructor();
     recognition.lang = "zh-CN";
     recognition.continuous = false;
-    recognition.interimResults = false;
-    const token = session;
+    recognition.interimResults = true;
     phase.value = "listening";
     caption.value = "正在聆听，请按住说话…";
     recognition.onresult = (event: any) => {
       if (token !== session) return;
-      const text = event.results[0]?.[0]?.transcript || "";
-      const intent = detectIntent(text);
-      if (intent) ask(intent);
-      else
-        show(
-          "我可以介绍实验、当前步骤、样本数量、剩余时间和检测结果，请换一种说法。",
-        );
+      let interim = "";
+      let final = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) final += transcript;
+        else interim += transcript;
+      }
+      const shown = final || interim;
+      if (shown) caption.value = shown;
+      if (final) handleTranscript(final);
     };
     recognition.onerror = (event: any) => {
       if (token !== session || event.error === "aborted") return;
@@ -172,6 +214,11 @@ export function useVoice(
     if (phase.value !== "listening") return;
     clearTimeout(listenTimer);
     phase.value = "thinking";
+    if (iat) {
+      if (!caption.value) caption.value = "正在识别…";
+      iat.stop();
+      return;
+    }
     caption.value = "正在识别…";
     recognition?.stop();
   }
