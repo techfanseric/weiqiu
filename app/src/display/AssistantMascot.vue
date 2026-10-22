@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import LayeredAssistant from "./LayeredAssistant.vue";
+import type { AssistantVariant } from "./assistantLayers";
 defineProps<{
   src: string;
   state: "idle" | "listening" | "thinking" | "speaking";
   compact?: boolean;
+  articulated?: boolean;
+  variant?: AssistantVariant;
 }>();
 </script>
 
 <template>
-  <span class="mascot" :class="[{ compact }, `mascot-${state}`]" :data-state="state" aria-hidden="true">
+  <span class="mascot" :class="[{ compact, articulated }, `mascot-${state}`]" :data-state="state" aria-hidden="true">
     <span class="mascot-aura"></span>
     <span class="mascot-ripple ripple-one"></span>
     <span class="mascot-ripple ripple-two"></span>
-    <img class="mascot-character" :src="src" alt="" draggable="false" />
+    <span v-if="articulated" class="mascot-character"><LayeredAssistant :state="state" :variant="variant" /></span>
+    <img v-else class="mascot-character" :src="src" alt="" draggable="false" />
     <span class="mascot-orbit"><i></i><i></i><i></i></span>
     <span class="mascot-voice"><i></i><i></i><i></i><i></i><i></i></span>
   </span>

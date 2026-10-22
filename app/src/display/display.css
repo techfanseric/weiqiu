@@ -1283,3 +1283,10 @@
 .cycle-preview { padding: 0; border: 0; background: none; font-size: 12px !important; color: #416f9e; }
 .cycle-preview[aria-pressed="true"] { color: #014ec0; }
 .voice-button.is-preview { border-style: dashed; }
+
+.assistant-motion-picker { display: flex; align-items: center; gap: 8px; padding: 0 26px 16px; font-size: 13px; color: #617c98; }
+.assistant-motion-picker > span { margin-right: auto; }
+.assistant-motion-picker button { font-size: 12px; padding: 6px 10px; border: 1px solid #dfe9f3; border-radius: 8px; color: #647e99; background: #f6f9fd; }
+.assistant-motion-picker button[aria-pressed="true"] { border-color: #7faadb; background: #eaf3ff; color: #014099; }
+.assistant-dialog.articulated-preview .assistant-portrait { width: 184px; height: 194px; top: -108px; left: calc(50% - 92px); }
+.assistant-dialog.articulated-preview .assistant-welcome { padding-top: 100px; }

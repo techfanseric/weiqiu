@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "common-web",
-  "version": "0.0.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "vite",

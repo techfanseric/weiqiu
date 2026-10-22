@@ -83,5 +83,65 @@
     "path": "app/src/assets/generated/lab-assistant-v4.png",
     "bytes": 850143,
     "sha256": "82dbdd08b5fbb4ba816de8a4025eafd0ccd93b088902341e2c7fec1e2f9b162f"
+  },
+  {
+    "path": "app/src/assets/generated/ceramic-head.png",
+    "bytes": 972864,
+    "sha256": "0463b18621a8b2b9288f44898aaa16de8322be8a97b97869d930c0dc923a7810"
+  },
+  {
+    "path": "app/src/assets/generated/ceramic-body.png",
+    "bytes": 803412,
+    "sha256": "c50d9ffa55b549a7d7552398518e1324b78ef070c9d57da6982e00bf09a01271"
+  },
+  {
+    "path": "app/src/assets/generated/ceramic-arm.png",
+    "bytes": 569545,
+    "sha256": "9857cdbe403ed3e38598bf2b6d22250f02bee67e190824704375d02884f39558"
+  },
+  {
+    "path": "app/src/assets/generated/classic-head.png",
+    "bytes": 1053458,
+    "sha256": "652e3c1f4f60ea491b7c691ba44127f1498830ddeb16a31fc0ae0b1b04d5f54e"
+  },
+  {
+    "path": "app/src/assets/generated/classic-body.png",
+    "bytes": 802600,
+    "sha256": "ecfddc29e278eee98b1c8b7075d5571dbc999885fbb0ba62539b42247ed8c333"
+  },
+  {
+    "path": "app/src/assets/generated/classic-arm.png",
+    "bytes": 442204,
+    "sha256": "77a3d78b4192cc857dcd5a7c111180c9df42ffdf9d99e194a525a518f6e7a097"
+  },
+  {
+    "path": "app/src/assets/generated/illustrated-head.png",
+    "bytes": 689180,
+    "sha256": "9f2e020352f95bd85fd72b98979fdf62f68601011840e56e6560e6df34867440"
+  },
+  {
+    "path": "app/src/assets/generated/illustrated-body.png",
+    "bytes": 610285,
+    "sha256": "f23149f50863a7f2e67c243388d557de81a64dde0c23677b962fb48826bb80c3"
+  },
+  {
+    "path": "app/src/assets/generated/illustrated-arm.png",
+    "bytes": 234749,
+    "sha256": "25d3467ac93c013bacab056d3aab02a500254ad0190a81e2a9c4820b95565625"
+  },
+  {
+    "path": "app/src/assets/generated/glass-head.png",
+    "bytes": 1047676,
+    "sha256": "b12cd5b69c6031c10cff2e477dad97765965337ea6ed0bdf0c2e77a2d98f894e"
+  },
+  {
+    "path": "app/src/assets/generated/glass-body.png",
+    "bytes": 791413,
+    "sha256": "7c27994def4a7c951775812c3536005c89303db5b6b4c443102b5bc5a12ff8d5"
+  },
+  {
+    "path": "app/src/assets/generated/glass-arm.png",
+    "bytes": 327532,
+    "sha256": "928e3495d1a9bd5a8db8fce95b947a49195031527ec55b8660414786219e2265"
   }
 ]

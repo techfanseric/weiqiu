@@ -11,6 +11,7 @@ import { useDisplay } from "./useDisplay";
 import { useVoice } from "./useVoice";
 import ScrollingCaption from "./ScrollingCaption.vue";
 import AssistantMascot from "./AssistantMascot.vue";
+import type { AssistantVariant } from "./assistantLayers";
 import {
   stages,
   statusLabels,
@@ -26,7 +27,7 @@ const { demo, count, elapsed, demoStatus, now, snapshot, quality, issue } =
   useDisplay();
 const route = useRoute();
 const router = useRouter();
-const assistantVariants = [
+const assistantVariants: { id: AssistantVariant; label: string; image: string }[] = [
   { id: "classic", label: "蓝晶伙伴", image: assistantV1 },
   { id: "ceramic", label: "白瓷伙伴", image: assistantV2 },
   { id: "illustrated", label: "轻绘精灵", image: assistantV3 },
@@ -40,6 +41,14 @@ const assistantStyle = computed({
 });
 const selectedAssistant = computed(() => assistantVariants.find((v) => v.id === assistantStyle.value)!);
 const assistant = computed(() => selectedAssistant.value.image);
+const assistantMotion = computed({
+  get: () => route.query.assistantMotion === "whole" ||
+    (!route.query.assistantMotion && assistantStyle.value === "ceramic" && route.query.ceramicMotion === "whole") ? "whole" : "layered",
+  set: (value: string) => router.replace({ query: {
+    ...route.query, assistantMotion: value === "whole" ? "whole" : undefined, ceramicMotion: undefined,
+  } }),
+});
+const articulated = computed(() => assistantMotion.value === "layered");
 const layout = computed({
   get: () => demo.value && route.query.layout === "machine-right" ? "machine-right" : "standard",
   set: (value: string) => {
@@ -366,7 +375,7 @@ const transportNote = computed(() =>
             role="status"
             aria-live="polite"
           >
-            <span class="caption-assistant"><AssistantMascot :src="assistant" :state="assistantState" compact />实验助手</span>
+            <span class="caption-assistant"><AssistantMascot :src="assistant" :state="assistantState" :articulated="articulated" :variant="assistantStyle" compact />实验助手</span>
             <ScrollingCaption
               :key="captionId"
               :text="caption"
@@ -604,7 +613,7 @@ const transportNote = computed(() =>
                 : '语音识别不可用，可使用常见问题'
             "
           >
-            <span class="assistant-avatar"><AssistantMascot :src="assistant" :state="assistantState" compact /></span
+            <span class="assistant-avatar"><AssistantMascot :src="assistant" :state="assistantState" :articulated="articulated" :variant="assistantStyle" compact /></span
             ><span
               >{{ previewState !== "auto" ? `预览 · ${assistantStateLabel}` : phaseLabels[phase]
               }}<small>{{
@@ -621,12 +630,12 @@ const transportNote = computed(() =>
         </div>
       </footer>
 
-      <section v-if="help" class="questions-popover assistant-dialog" role="dialog" aria-labelledby="assistant-title" @keydown.esc="closeAssistant">
+      <section v-if="help" class="questions-popover assistant-dialog" :class="{ 'articulated-preview': articulated }" role="dialog" aria-labelledby="assistant-title" @keydown.esc="closeAssistant">
         <button class="assistant-close icon-button" aria-label="收起实验助手" @click="closeAssistant">
           <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
         <div class="assistant-welcome">
-          <div class="assistant-portrait"><AssistantMascot :src="assistant" :state="assistantState" /></div>
+          <div class="assistant-portrait"><AssistantMascot :src="assistant" :state="assistantState" :articulated="articulated" :variant="assistantStyle" /></div>
           <span class="assistant-kicker" role="status">{{ previewState === "auto" ? "你的实验小伙伴" : `动效预览 · ${assistantStateLabel}` }}</span>
           <h2 id="assistant-title">你好，我是实验助手</h2>
           <p>一起看看，实验进行到哪里了。</p>
@@ -646,6 +655,11 @@ const transportNote = computed(() =>
               <img :src="variant.image" alt="" /><span>{{ variant.label }}</span>
             </button>
           </div>
+        </div>
+        <div class="assistant-motion-picker" role="group" aria-label="助手动画方式">
+          <span>动画方式</span>
+          <button type="button" :aria-pressed="assistantMotion === 'layered'" @click="assistantMotion = 'layered'">分层表情</button>
+          <button type="button" :aria-pressed="assistantMotion === 'whole'" @click="assistantMotion = 'whole'">整体轻动</button>
         </div>
         <div class="assistant-animation-picker">
           <div class="assistant-variant-heading"><span>动效预览</span><button class="cycle-preview" type="button" :aria-pressed="cycling" @click="toggleCycle">{{ cycling ? "停止循环" : "循环演示" }}</button></div>
