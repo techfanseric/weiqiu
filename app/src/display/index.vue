@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import machine from "@/assets/generated/microsphere-workcell.png";
 import logo from "@/assets/brand/siat-logo.png";
+import assistantV1 from "@/assets/generated/lab-assistant-v1.png";
+import assistantV2 from "@/assets/generated/lab-assistant-v2.png";
+import assistantV3 from "@/assets/generated/lab-assistant-v3.png";
+import assistantV4 from "@/assets/generated/lab-assistant-v4.png";
 import { useDisplay } from "./useDisplay";
 import { useVoice } from "./useVoice";
 import ScrollingCaption from "./ScrollingCaption.vue";
+import AssistantMascot from "./AssistantMascot.vue";
 import {
   stages,
   statusLabels,
@@ -21,6 +26,20 @@ const { demo, count, elapsed, demoStatus, now, snapshot, quality, issue } =
   useDisplay();
 const route = useRoute();
 const router = useRouter();
+const assistantVariants = [
+  { id: "classic", label: "蓝晶伙伴", image: assistantV1 },
+  { id: "ceramic", label: "白瓷伙伴", image: assistantV2 },
+  { id: "illustrated", label: "轻绘精灵", image: assistantV3 },
+  { id: "glass", label: "晶透助手", image: assistantV4 },
+];
+const assistantStyle = computed({
+  get: () => assistantVariants.find((v) => v.id === route.query.assistant)?.id || "classic",
+  set: (value: string) => {
+    router.replace({ query: { ...route.query, assistant: value === "classic" ? undefined : value } });
+  },
+});
+const selectedAssistant = computed(() => assistantVariants.find((v) => v.id === assistantStyle.value)!);
+const assistant = computed(() => selectedAssistant.value.image);
 const layout = computed({
   get: () => demo.value && route.query.layout === "machine-right" ? "machine-right" : "standard",
   set: (value: string) => {
@@ -33,9 +52,50 @@ const {
   phase, caption, captionId, highlight, muted, supported,
   ask, begin, end, stop, setCaptionReading, pauseCaption,
 } = useVoice(snapshot, quality, now);
+type AssistantState = "idle" | "listening" | "thinking" | "speaking";
+const animationStates: { id: AssistantState; label: string }[] = [
+  { id: "idle", label: "待机" }, { id: "listening", label: "聆听" },
+  { id: "thinking", label: "思考" }, { id: "speaking", label: "说话" },
+];
+const previewState = ref<AssistantState | "auto">("auto");
+const cycling = ref(false);
+let animationTimer: ReturnType<typeof setInterval> | undefined;
+const assistantState = computed<AssistantState>(() =>
+  previewState.value !== "auto" ? previewState.value : phase.value === "error" ? "idle" : phase.value,
+);
+const assistantStateLabel = computed(() => animationStates.find((s) => s.id === assistantState.value)!.label);
+function setPreview(state: AssistantState | "auto") {
+  clearInterval(animationTimer);
+  animationTimer = undefined;
+  cycling.value = false;
+  previewState.value = state;
+}
+function toggleCycle() {
+  if (cycling.value) { setPreview("auto"); return; }
+  setPreview("idle");
+  cycling.value = true;
+  let index = 0;
+  animationTimer = setInterval(() => {
+    index = (index + 1) % animationStates.length;
+    previewState.value = animationStates[index].id;
+  }, 3000);
+}
+function closeAssistant() { help.value = false; setPreview("auto"); }
+function beginVoice() { setPreview("auto"); help.value = false; begin(); }
+function askQuestion(intent: Parameters<typeof ask>[0]) {
+  setPreview("auto"); help.value = false; ask(intent);
+}
+watch(phase, (value) => { if (value !== "idle") setPreview("auto"); });
+onUnmounted(() => clearInterval(animationTimer));
 const scale = ref(1);
 const settings = ref(false);
 const help = ref(false);
+function toggleHelp() {
+  if (help.value) { closeAssistant(); return; }
+  setPreview("auto");
+  stop();
+  help.value = true;
+}
 const fullscreenError = ref("");
 function resize() {
   scale.value = Math.min(innerWidth / 1920, innerHeight / 1080);
@@ -306,7 +366,7 @@ const transportNote = computed(() =>
             role="status"
             aria-live="polite"
           >
-            <span>实验助手</span>
+            <span class="caption-assistant"><AssistantMascot :src="assistant" :state="assistantState" compact />实验助手</span>
             <ScrollingCaption
               :key="captionId"
               :text="caption"
@@ -512,10 +572,10 @@ const transportNote = computed(() =>
         <div class="assistant-control">
           <button
             class="text-button"
-            @click="help = !help"
+            @click="toggleHelp"
             :aria-expanded="help"
           >
-            常见问题</button
+            问问助手</button
           ><button
             class="text-button"
             @click="muted = !muted"
@@ -524,18 +584,18 @@ const transportNote = computed(() =>
             {{ muted ? "已静音" : "语音播报" }}</button
           ><button
             class="voice-button"
-            :class="phase"
+            :class="[assistantState, { 'is-preview': previewState !== 'auto' }]"
             @pointerdown="
               ($event.currentTarget as HTMLElement).setPointerCapture(
                 $event.pointerId,
               );
-              begin();
+              beginVoice();
             "
             @pointerup="end"
             @pointercancel="end"
-            @keydown.space.prevent="!$event.repeat && begin()"
+            @keydown.space.prevent="!$event.repeat && beginVoice()"
             @keyup.space.prevent="end"
-            @keydown.enter.prevent="!$event.repeat && begin()"
+            @keydown.enter.prevent="!$event.repeat && beginVoice()"
             @keyup.enter.prevent="end"
             @blur="end"
             :aria-label="
@@ -544,11 +604,13 @@ const transportNote = computed(() =>
                 : '语音识别不可用，可使用常见问题'
             "
           >
-            <span class="assistant-orb"><i></i><i></i><i></i></span
+            <span class="assistant-avatar"><AssistantMascot :src="assistant" :state="assistantState" compact /></span
             ><span
-              >{{ phaseLabels[phase]
+              >{{ previewState !== "auto" ? `预览 · ${assistantStateLabel}` : phaseLabels[phase]
               }}<small>{{
-                phase === "idle"
+                previewState !== "auto"
+                  ? "动效预览 · 未开启收音"
+                  : phase === "idle"
                   ? "按住说话 / 空格键"
                   : phase === "listening"
                     ? "松开结束"
@@ -559,27 +621,42 @@ const transportNote = computed(() =>
         </div>
       </footer>
 
-      <div v-if="help" class="questions-popover">
-        <div class="popover-title">
-          向实验助手提问<button
-            class="text-button"
-            aria-label="关闭常见问题"
-            @click="help = false"
-          >
-            关闭
+      <section v-if="help" class="questions-popover assistant-dialog" role="dialog" aria-labelledby="assistant-title" @keydown.esc="closeAssistant">
+        <button class="assistant-close icon-button" aria-label="收起实验助手" @click="closeAssistant">
+          <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+        <div class="assistant-welcome">
+          <div class="assistant-portrait"><AssistantMascot :src="assistant" :state="assistantState" /></div>
+          <span class="assistant-kicker" role="status">{{ previewState === "auto" ? "你的实验小伙伴" : `动效预览 · ${assistantStateLabel}` }}</span>
+          <h2 id="assistant-title">你好，我是实验助手</h2>
+          <p>一起看看，实验进行到哪里了。</p>
+        </div>
+        <div class="assistant-suggestions">
+          <span class="suggestion-heading">你可以这样问我</span>
+          <button v-for="q in questions" :key="q.intent" @click="askQuestion(q.intent)">
+            {{ q.label }}<span aria-hidden="true">↗</span>
           </button>
         </div>
-        <button
-          v-for="q in questions"
-          :key="q.intent"
-          @click="
-            ask(q.intent);
-            help = false;
-          "
-        >
-          {{ q.label }}<span>↗</span></button
-        ><small>按键触发 · 仅查询当前实验状态</small>
-      </div>
+        <div class="assistant-variant-picker" role="group" aria-label="助手形象选择">
+          <div class="assistant-variant-heading"><span>助手形象</span><small>点击切换，看看你更喜欢哪一种</small></div>
+          <div class="assistant-variants">
+            <button v-for="variant in assistantVariants" :key="variant.id" type="button"
+              :aria-pressed="assistantStyle === variant.id" :aria-label="`切换为${variant.label}`"
+              @click="assistantStyle = variant.id">
+              <img :src="variant.image" alt="" /><span>{{ variant.label }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="assistant-animation-picker">
+          <div class="assistant-variant-heading"><span>动效预览</span><button class="cycle-preview" type="button" :aria-pressed="cycling" @click="toggleCycle">{{ cycling ? "停止循环" : "循环演示" }}</button></div>
+          <div class="assistant-state-options" role="group" aria-label="助手动效预览">
+            <button type="button" :aria-pressed="previewState === 'auto'" @click="setPreview('auto')">自动</button>
+            <button v-for="state in animationStates" :key="state.id" type="button" :aria-pressed="previewState === state.id" @click="setPreview(state.id)">{{ state.label }}</button>
+          </div>
+          <p>{{ previewState === "auto" ? "跟随实际问答状态" : "仅预览动效，不启用麦克风或语音播报" }}</p>
+        </div>
+        <div class="assistant-dialog-bottom"><span class="assistant-status-dot"></span>按住右下角说话，或按住空格键</div>
+      </section>
       <div v-if="settings && demo" class="demo-settings">
         <div class="popover-title">
           演示场景<button

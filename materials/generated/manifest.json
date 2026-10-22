@@ -63,5 +63,25 @@
     "path": "app/public/fonts/NotoSansSC-0-0.woff2",
     "bytes": 66304,
     "sha256": "96f5ce381909ebe4165e6c401fad83e8a4364aeac603a49a688b0e8712748cea"
+  },
+  {
+    "path": "app/src/assets/generated/lab-assistant-v1.png",
+    "bytes": 791606,
+    "sha256": "5971143c3550be0a0f2bb0a27e4ec76a973fd4bdc12750254ed272176411fa4f"
+  },
+  {
+    "path": "app/src/assets/generated/lab-assistant-v2.png",
+    "bytes": 832340,
+    "sha256": "1d2e09c0632e71d47c5a81d4fe069254aecaabd68d0bb8be8da017f08673212e"
+  },
+  {
+    "path": "app/src/assets/generated/lab-assistant-v3.png",
+    "bytes": 573988,
+    "sha256": "c0294a23a579cbffaf33d602197f8192152a0fa6413988e65fd6286d1a20f1bb"
+  },
+  {
+    "path": "app/src/assets/generated/lab-assistant-v4.png",
+    "bytes": 850143,
+    "sha256": "82dbdd08b5fbb4ba816de8a4025eafd0ccd93b088902341e2c7fec1e2f9b162f"
   }
 ]
